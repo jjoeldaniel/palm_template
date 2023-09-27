@@ -1,20 +1,12 @@
-<!doctype html>
-<html lang="en">
+{% extends "template.html" %}
+{% block content %}
+<form method="post" enctype="multipart/form-data">
+  <p>Let's find out how to integrate AI into our web app!</p>
+  <h3>Upload a file to ...</h3>
 
-<head>
-  <meta charset="utf-8">
-  <title>AI Workshop</title>
-  <meta name="description" content="">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-
-  <meta property="og:title" content="AI Workshop">
-  <meta property="og:type" content="omg is AI taking my job???">
-</head>
-
-<body>
-
-  <p>Hello world!</p>
-
-</body>
-
-</html>
+  <label for="file">File browser
+    <input type="file" id="file" accept=".pdf,.txt" name="file" />
+  </label>
+  <input type="submit" value="Submit" />
+</form>
+{% endblock %}
