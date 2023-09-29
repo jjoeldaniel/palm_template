@@ -59,7 +59,7 @@ async def upload(request: Request, file: UploadFile):
     if content == "":
         content = "Failed to extract text"
         res = ""
-        return templates.TemplateResponse("file.html", {"request": request, "file_name": file.filename, "content": content, "ai": res})
+        return templates.TemplateResponse("file.html", {"request": request, "file_name": file.filename, "content": content, "ai": res, "prompt": PROMPT})
 
     payload = f"""
     {PROMPT}:
@@ -76,7 +76,7 @@ async def upload(request: Request, file: UploadFile):
 
     cache[content] = res
 
-    return templates.TemplateResponse("file.html", {"request": request, "file_name": file.filename, "content": content, "ai": res})
+    return templates.TemplateResponse("file.html", {"request": request, "file_name": file.filename, "content": content, "ai": res, "prompt": PROMPT})
 
 
 if __name__ == "__main__":
