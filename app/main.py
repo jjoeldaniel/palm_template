@@ -22,10 +22,13 @@ app = FastAPI()
 app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="templates")
 
+PROMPT = "Describe the following text"
+cache: dict[str, str] = {}
+
 
 @app.get("/", response_class=HTMLResponse)
 async def root(request: Request):
-    return templates.TemplateResponse("index.html", {"request": request})
+    return templates.TemplateResponse("index.html", {"request": request, "prompt": PROMPT})
 
 
 @app.post("/", response_class=HTMLResponse)
@@ -43,6 +46,11 @@ async def upload(request: Request, file: UploadFile):
             else:
                 content = contents.decode()
 
+            content = content[0:500]+"..."
+
+            if content in cache:
+                return templates.TemplateResponse("file.html", {"request": request, "file_name": file.filename, "content": content, "ai": cache[content]})
+
     except Exception as e:
         return templates.TemplateResponse("error.html", {"request": request, "error": e})
     finally:
@@ -53,19 +61,20 @@ async def upload(request: Request, file: UploadFile):
         res = ""
         return templates.TemplateResponse("file.html", {"request": request, "file_name": file.filename, "content": content, "ai": res})
 
-    question = "Describe the following text"
-    prompt = f"""
-    {question}:
+    payload = f"""
+    {PROMPT}:
 
     {content}
     """
 
     res = palm.generate_text(
-        prompt=prompt,
+        prompt=payload,
         temperature=0.5,
         max_output_tokens=600,
     ).result
     res = markdown.markdown(res)
+
+    cache[content] = res
 
     return templates.TemplateResponse("file.html", {"request": request, "file_name": file.filename, "content": content, "ai": res})
 
